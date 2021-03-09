@@ -1,0 +1,19 @@
+:Component a rdfs:Class .
+
+:Board a owl:Class ;
+    rdfs:subClassOf :Component .
+
+:board_a a :Board ;
+    :id '5dde7a2f37f194419553206b' ;
+    :name 'SandboxProject' ;
+    :dateLastActivity '2021-03-02T15:03:35.866Z' .
+
+:board_b a :Board ;
+    :id 'safsafsdafsavif19443206b' ;
+    :name 'Board B' ;
+    :dateLastActivity '2021-03-02T15:03:35.866Z' .
+
+:board_c a :Board ;
+    :id 'iusabfsa87f194419553206b' ;
+    :name 'Board C' ;
+    :dateLastActivity '2021-03-02T15:03:35.866Z' .
