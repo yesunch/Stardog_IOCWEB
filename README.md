@@ -2,6 +2,32 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+# Utilisation of this project 
+
+
+```
+git clone https://github.com/yesunch/Stardog_IOCWEB.git
+cd Stardog_IOCWEB
+npm install    # initilize this project
+$STARDOG_HOME/bin/stardog-admin server start
+yarn start
+cd src/data
+node load-board-data.js # load board data
+$STARDOG_HOME/bin/stardog data add BoardDb myBoards.ttl # add data into db
+```
+
+## Data verification in Stardog Studio
+
+```
+SELECT ?id ?name ?dateLastActivity ?kind  {
+  ?subject a ?kind ;
+    :id ?id ;
+    :name ?name ;
+    :dateLastActivity ?dateLastActivity .
+  ?kind rdfs:subClassOf :Component .
+}
+```
+
 ## Available Scripts
 
 In the project directory, you can run:
@@ -68,3 +94,4 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `yarn build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
