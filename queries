@@ -1,0 +1,10 @@
+
+# Find the board(s) which contain list(s)
+SELECT ?id ?name ?dateLastActivity ?kind ?list {
+  ?subject a :kind ;
+    :id ?id ;
+    :name ?name ;
+    :dateLastActivity ?dateLastActivity ;
+    :HasList ?list .
+  ?kind rdf:type :Board .
+}

@@ -15,13 +15,35 @@ const columnData = [
     selector: "dateLastActivity",
     label: "DateLastActivity"
   },
+  ,
+  {
+    selector: "kind",
+    label: "Kind"
+  },
   
 ];
+
+
+const queryColumnData = [
+  {
+    selector: "name",
+    label: "Name"
+  },
+  {
+    selector: "list",
+    label: "List"
+  }
+]
 
 // For convenience, we'll also produce the array of selectors just once, and
 // export it for re-use.
 const columnSelectors = columnData.reduce(
   (selectors, { selector }) => [...selectors, selector],
+  []
+);
+
+const queryColumnSelectors = queryColumnData.reduce(
+  (selectors,{ selector }) => [...selectors, selector],
   []
 );
 
@@ -44,6 +66,7 @@ const TableDataAvailabilityStatus = {
 module.exports = {
   dbName: 'BoardDb',
   columnData,
+  queryColumnSelectors,
   columnSelectors,
   conn,
   TableDataAvailabilityStatus,

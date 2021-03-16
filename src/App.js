@@ -11,10 +11,15 @@ import TableRow from "@material-ui/core/TableRow";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import CircularProgress from '@material-ui/core/CircularProgress';
+import {MDCRipple} from "@material/ripple";
+import {MDCFormField} from "@material/form-field";
+import {MDCCheckbox} from "@material/checkbox"
+
 import {
   TableDataAvailabilityStatus,
   columnData,
   columnSelectors,
+  queryColumnSelectors,
   conn,
   dbName,
 } from "./helpers/boardConstants";
@@ -45,12 +50,22 @@ const readQuery = `SELECT ?id ?name ?dateLastActivity ?kind  {
     :dateLastActivity ?dateLastActivity .
   ?kind rdfs:subClassOf :Component .
 }`;
+
+const componentHasListQuery = `SELECT ?name  ?list {
+  ?subject a :Component ;
+    :id ?id ;
+    :name ?name ;
+    :dateLastActivity ?dateLastActivity ;
+    :HasList ?list .
+}`;
+
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       dataState: TableDataAvailabilityStatus.NOT_REQUESTED,
-      data: []
+      data: [],
+      queryResults: []
     };
   }
 
@@ -70,8 +85,21 @@ class App extends Component {
     );
   }
 
+  renderRowForQueryResults(binding, index) {
+    return (
+      // Use every "selector" to extract table cell data from each binding.
+      <TableRow key={binding.id}>
+        {queryColumnSelectors.map(selector => (
+          <TableCell key={selector}>
+            {this.getBindingValueForSelector(selector, binding)}
+          </TableCell>
+        ))}
+      </TableRow>
+    );
+  }
+
   render() {
-    const { dataState, data } = this.state;
+    const { dataState, data, queryResults} = this.state;
     const isLoading = dataState === TableDataAvailabilityStatus.LOADING;
 
     return (
@@ -80,9 +108,13 @@ class App extends Component {
         <Paper style={styles.paper}>
           <Toolbar>
             <Typography variant="title">
-              <i>Star Wars</i> with Stardog
+           The whole content of DB
             </Typography>
           </Toolbar>
+          <Button>
+            Reasonning
+          </Button>
+
           {isLoading ? <CircularProgress style={styles.spinner} /> : (
             <Table>
               <TableHead>
@@ -112,6 +144,27 @@ class App extends Component {
               </TableBody>
             </Table>
           )}
+          <Toolbar>
+          <Typography variant="title">
+              <i>Components</i> that have lists
+            </Typography>
+          </Toolbar>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>
+                  Component
+                </TableCell>
+                <TableCell>
+                  Lists
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+            {queryResults.map((binding, index) => this.renderRowForQueryResults(binding, index))}
+            {console.log(queryResults)}
+            </TableBody>
+          </Table>
         </Paper>
       </div>
     );
@@ -125,7 +178,10 @@ class App extends Component {
     this.setState({
       dataState: TableDataAvailabilityStatus.LOADING
     });
-    query.execute(conn, dbName, readQuery).then(res => {
+    var reasoning = true;
+    query.execute(conn, dbName, readQuery, 'application/sparql-results+json',{
+      reasoning: reasoning
+    }).then(res => {
       if (!res.ok) {
         this.setState({
           dataState: TableDataAvailabilityStatus.FAILED
@@ -140,6 +196,31 @@ class App extends Component {
         dataState: TableDataAvailabilityStatus.LOADED,
         data: bindings
       });
+
+      console.log("data")
+      console.log(bindings)
+    });
+
+    query.execute(conn, dbName, componentHasListQuery, 'application/sparql-results+json',{
+      reasoning: reasoning
+    }).then(res => {
+      if (!res.ok) {
+        this.setState({
+          dataState: TableDataAvailabilityStatus.FAILED
+        });
+        return;
+      }
+
+      const  results  = res.body.results.bindings;
+      // const bindingsForTable = this.getBindingsFormattedForTable(bindings);
+      console.log("results")
+      console.log(results)
+      this.setState({
+        dataState: TableDataAvailabilityStatus.LOADED,
+        queryResults: results
+      });
+
+
     });
   }
 
@@ -147,10 +228,15 @@ class App extends Component {
     const bindingValue = binding[selector === "movie" ? "movies" : selector];
     // NOTE: In a production app, we would probably want to do this formatting elsewhere.
     // console.log("bindingValue:")
-    // console.log(bindingValue)
+    console.log("selector")
+    console.log(selector)
+    console.log("binding")
+    console.log(binding)
     return bindingValue["value"]
     // return Array.isArray(bindingValue) ? bindingValue.join(", ") : bindingValue;
   }
+
+  
 
   // NOTE: Does no validation and assumes certain inputs; not production-ready!
 addItem() {

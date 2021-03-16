@@ -14,6 +14,7 @@ const logFailure = failureReason => console.error(failureReason);
 // The "main" method for this script.
 const loadBoardData = () => {
   console.log(`Creating ${dbName}...\n`);
+  console.log(insertBoardsQuery)
 
   return db
     .create(conn, dbName)
