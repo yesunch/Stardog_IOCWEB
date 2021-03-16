@@ -1,0 +1,253 @@
+@prefix : <http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11> .
+
+<http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11> rdf:type owl:Ontology .
+
+#################################################################
+#    Object Properties
+#################################################################
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#contains
+:contains rdf:type owl:ObjectProperty ;
+          owl:inverseOf :partOf ;
+          rdf:type owl:TransitiveProperty ;
+          rdfs:domain :Component ;
+          rdfs:range :Component .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#hasAuthority
+:hasAuthority rdf:type owl:ObjectProperty ;
+              rdfs:domain :Membership ;
+              rdfs:range :Authority .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#hasMember
+:hasMember rdf:type owl:ObjectProperty ;
+           rdfs:domain :Membership ;
+           rdfs:range :Member .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#hasMemberShip
+:hasMemberShip rdf:type owl:ObjectProperty ,
+                        owl:AsymmetricProperty ,
+                        owl:IrreflexiveProperty ;
+               rdfs:domain :Board ;
+               rdfs:range :Membership .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#hasProject
+:hasProject rdf:type owl:ObjectProperty ;
+            rdfs:domain :Member ;
+            rdfs:range :Board .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#leafComponentOf
+:leafComponentOf rdf:type owl:ObjectProperty ;
+                 rdfs:subPropertyOf owl:topObjectProperty ;
+                 owl:inverseOf :rootComponentOf .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#partOf
+:partOf rdf:type owl:ObjectProperty ,
+                 owl:TransitiveProperty ;
+        rdfs:domain :Component ;
+        rdfs:range :Component .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#rootComponentOf
+:rootComponentOf rdf:type owl:ObjectProperty ;
+                 rdfs:subPropertyOf owl:topObjectProperty .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Authority
+:Authority rdf:type owl:Class ;
+           owl:equivalentClass [ rdf:type owl:Class ;
+                                 owl:oneOf ( :Admin
+                                             :Normal
+                                           )
+                               ] .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Board
+:Board rdf:type owl:Class ;
+       rdfs:subClassOf :Component .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Card
+:Card rdf:type owl:Class ;
+      rdfs:subClassOf :Component ,
+                      [ rdf:type owl:Restriction ;
+                        owl:onProperty :partOf ;
+                        owl:allValuesFrom :List
+                      ] .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Component
+:Component rdf:type owl:Class ;
+           owl:disjointWith :Human .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Human
+:Human rdf:type owl:Class .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#List
+:List rdf:type owl:Class ;
+      rdfs:subClassOf :Component ,
+                      [ rdf:type owl:Restriction ;
+                        owl:onProperty :partOf ;
+                        owl:allValuesFrom :Board
+                      ] .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Member
+:Member rdf:type owl:Class ;
+        owl:equivalentClass [ owl:intersectionOf ( :Human
+                                                   [ rdf:type owl:Restriction ;
+                                                     owl:onProperty :hasProject ;
+                                                     owl:minCardinality "1"^^xsd:nonNegativeInteger
+                                                   ]
+                                                 ) ;
+                              rdf:type owl:Class
+                            ] ;
+        rdfs:subClassOf :Human .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Membership
+:Membership rdf:type owl:Class ;
+            owl:equivalentClass [ owl:intersectionOf ( :Member
+                                                       [ rdf:type owl:Restriction ;
+                                                         owl:onProperty :hasAuthority ;
+                                                         owl:minCardinality "1"^^xsd:nonNegativeInteger
+                                                       ]
+                                                     ) ;
+                                  rdf:type owl:Class
+                                ] .
+
+
+#################################################################
+#    Individuals
+#################################################################
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Admin
+:Admin rdf:type owl:NamedIndividual ,
+                :Authority .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Coding_resolution
+:Coding_resolution rdf:type owl:NamedIndividual ,
+                            :Card .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Doing
+:Doing rdf:type owl:NamedIndividual ,
+                :List ;
+       :contains :Coding_resolution .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Done
+:Done rdf:type owl:NamedIndividual ,
+               :List ;
+      :contains :Problem_Analysis .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Membership_of_Rachel
+:Membership_of_Rachel rdf:type owl:NamedIndividual ,
+                               :Membership ;
+                      :hasAuthority :Admin ;
+                      :hasMember :Rachel .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Normal
+:Normal rdf:type owl:NamedIndividual ,
+                 :Authority .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Problem_Analysis
+:Problem_Analysis rdf:type owl:NamedIndividual ,
+                           :Card .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Projet_3A
+:Projet_3A rdf:type owl:NamedIndividual ,
+                    :Board ;
+           :contains :Doing ,
+                     :Done ,
+                     :ToDo ;
+           :hasMemberShip :Membership_of_Rachel .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Rachel
+:Rachel rdf:type owl:NamedIndividual ,
+                 :Member ;
+        :hasProject :Projet_3A .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Test
+:Test rdf:type owl:NamedIndividual ,
+               :Card .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#ToDo
+:ToDo rdf:type owl:NamedIndividual ,
+               :List ;
+      :contains :Test .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Tom
+:Tom rdf:type owl:NamedIndividual ,
+              :Member .
+
+
+#################################################################
+#    Rules
+#################################################################
+
+<urn:swrl:var#x> rdf:type <http://www.w3.org/2003/11/swrl#Variable> .
+
+<urn:swrl:var#y> rdf:type <http://www.w3.org/2003/11/swrl#Variable> .
+
+<urn:swrl:var#z> rdf:type <http://www.w3.org/2003/11/swrl#Variable> .
+
+[ rdf:type <http://www.w3.org/2003/11/swrl#Imp> ;
+   <http://www.w3.org/2003/11/swrl#body> [ rdf:type <http://www.w3.org/2003/11/swrl#AtomList> ;
+                                           rdf:first [ rdf:type <http://www.w3.org/2003/11/swrl#ClassAtom> ;
+                                                       <http://www.w3.org/2003/11/swrl#classPredicate> :Card ;
+                                                       <http://www.w3.org/2003/11/swrl#argument1> <urn:swrl:var#x>
+                                                     ] ;
+                                           rdf:rest [ rdf:type <http://www.w3.org/2003/11/swrl#AtomList> ;
+                                                      rdf:first [ rdf:type <http://www.w3.org/2003/11/swrl#IndividualPropertyAtom> ;
+                                                                  <http://www.w3.org/2003/11/swrl#propertyPredicate> :partOf ;
+                                                                  <http://www.w3.org/2003/11/swrl#argument1> <urn:swrl:var#x> ;
+                                                                  <http://www.w3.org/2003/11/swrl#argument2> <urn:swrl:var#y>
+                                                                ] ;
+                                                      rdf:rest [ rdf:type <http://www.w3.org/2003/11/swrl#AtomList> ;
+                                                                 rdf:first [ rdf:type <http://www.w3.org/2003/11/swrl#IndividualPropertyAtom> ;
+                                                                             <http://www.w3.org/2003/11/swrl#propertyPredicate> :partOf ;
+                                                                             <http://www.w3.org/2003/11/swrl#argument1> <urn:swrl:var#y> ;
+                                                                             <http://www.w3.org/2003/11/swrl#argument2> <urn:swrl:var#z>
+                                                                           ] ;
+                                                                 rdf:rest rdf:nil
+                                                               ]
+                                                    ]
+                                         ] ;
+   <http://www.w3.org/2003/11/swrl#head> [ rdf:type <http://www.w3.org/2003/11/swrl#AtomList> ;
+                                           rdf:first [ rdf:type <http://www.w3.org/2003/11/swrl#IndividualPropertyAtom> ;
+                                                       <http://www.w3.org/2003/11/swrl#propertyPredicate> :leafComponentOf ;
+                                                       <http://www.w3.org/2003/11/swrl#argument1> <urn:swrl:var#x> ;
+                                                       <http://www.w3.org/2003/11/swrl#argument2> <urn:swrl:var#z>
+                                                     ] ;
+                                           rdf:rest rdf:nil
+                                         ]
+ ] .
+
+###  Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi
