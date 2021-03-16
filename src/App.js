@@ -11,6 +11,9 @@ import TableRow from "@material-ui/core/TableRow";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import CircularProgress from '@material-ui/core/CircularProgress';
+import FormGroup from '@material-ui/core/FormGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Switch from '@material-ui/core/Switch';
 import {MDCRipple} from "@material/ripple";
 import {MDCFormField} from "@material/form-field";
 import {MDCCheckbox} from "@material/checkbox"
@@ -65,7 +68,8 @@ class App extends Component {
     this.state = {
       dataState: TableDataAvailabilityStatus.NOT_REQUESTED,
       data: [],
-      queryResults: []
+      queryResults: [],
+      enabledReasoning: false
     };
   }
 
@@ -98,6 +102,14 @@ class App extends Component {
     );
   }
 
+  
+
+  //  handleChange = (event) => {
+  //   this.setState({ ...this.state, [this.state.enabledReasoning]: event.target.checked });
+  //   // this.state.enabledReasoning = !this.state.enabledReasoning;
+  //   console.log("reasoning...")
+  //   console.log(this.state.enabledReasoning)
+  // };
   render() {
     const { dataState, data, queryResults} = this.state;
     const isLoading = dataState === TableDataAvailabilityStatus.LOADING;
@@ -111,9 +123,12 @@ class App extends Component {
            The whole content of DB
             </Typography>
           </Toolbar>
-          <Button>
-            Reasonning
-          </Button>
+          <FormControlLabel
+          control={<Switch checked={this.state.enabledReasoning} 
+          onChange={(event) => {this.setState({enabledReasoning: event.target.checked}, ()=>{this.refreshData(this.state.enabledReasoning)}); }} 
+          name="enabledReasoning" />}
+          label="Reasoning"
+        />
 
           {isLoading ? <CircularProgress style={styles.spinner} /> : (
             <Table>
@@ -162,7 +177,7 @@ class App extends Component {
             </TableHead>
             <TableBody>
             {queryResults.map((binding, index) => this.renderRowForQueryResults(binding, index))}
-            {console.log(queryResults)}
+          
             </TableBody>
           </Table>
         </Paper>
@@ -171,14 +186,20 @@ class App extends Component {
   }
 
   componentDidMount() {
-    this.refreshData();
+    this.refreshData(this.state.enabledReasoning);
   }
+
+  // componentDidUpdate() {
+  //   this.refreshData(this.state.enabledReasoning);
+  // }
   
-  refreshData() {
+  refreshData(reasoning) {
+    console.log("***********refreshing data**************")
+    console.log(reasoning)
     this.setState({
       dataState: TableDataAvailabilityStatus.LOADING
     });
-    var reasoning = true;
+    // var reasoning = true;
     query.execute(conn, dbName, readQuery, 'application/sparql-results+json',{
       reasoning: reasoning
     }).then(res => {
@@ -228,10 +249,10 @@ class App extends Component {
     const bindingValue = binding[selector === "movie" ? "movies" : selector];
     // NOTE: In a production app, we would probably want to do this formatting elsewhere.
     // console.log("bindingValue:")
-    console.log("selector")
-    console.log(selector)
-    console.log("binding")
-    console.log(binding)
+    // console.log("selector")
+    // console.log(selector)
+    // console.log("binding")
+    // console.log(binding)
     return bindingValue["value"]
     // return Array.isArray(bindingValue) ? bindingValue.join(", ") : bindingValue;
   }
@@ -293,7 +314,7 @@ deleteItem(item) {
 
   console.log(deleteQuery)
 
-  query.execute(conn, dbName, deleteQuery).then(() => this.refreshData());
+  query.execute(conn, dbName, deleteQuery).then(() => this.refreshData(this.state.enabledReasoning));
 }
 
 }
