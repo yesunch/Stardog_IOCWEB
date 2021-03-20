@@ -47,6 +47,13 @@ WHERE {
     ?list a :List .
 }
 
+## Get All of the list that have a member
+SELECT DISTINCT ?list ?member
+WHERE {
+    ?list a :Board ;
+          :hasMember ?member .
+}
+
 ## Get All of the lists that have a card
 SELECT DISTINCT ?list ?card
 WHERE {
@@ -55,11 +62,28 @@ WHERE {
     ?card a :Card .
 }
 
-## Create a new Board
+## Get All of the member
+SELECT DISTINCT ?member ?project ?authority
+WHERE {
+    ?member a :Member ;
+      :hasProject ?project .
+}
+
+
+
+## Create a new Board with lists, cards and an admin membership
 INSERT  {
+    ?member a :Member ;
+            :hasProject ?newBoard .
+
+    ?memberShip a :MemberShip ;
+                :hasMember ?member ;
+                :hasAuthority :Admin .
+
     ?newBoard a :Board ;
                 :id ?boardId ;
                 :name ?boardName ;
+                :hasMemberShip ?memberShip ;
                 :desc "Created a new Board to test" .
     
     ?newList_a a :List ;
@@ -97,6 +121,10 @@ INSERT  {
     
 }
 WHERE {
+    BIND (:Alice as ?member) .
+    BIND (:MemberShip_of_Alice as ?memberShip) .
+
+
     BIND (:Projet_3A as ?newBoard) .
     BIND (22 as ?boardId) .
     BIND ("Projet 3A" as ?boardName) .
