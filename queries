@@ -1,10 +1,49 @@
 
 # Find the board(s) which contain list(s)
-SELECT ?id ?name ?dateLastActivity ?kind ?list {
-  ?subject a :kind ;
-    :id ?id ;
-    :name ?name ;
-    :dateLastActivity ?dateLastActivity ;
-    :HasList ?list .
-  ?kind rdf:type :Board .
+# SELECT ?name  ?list {
+#   ?subject a :Component ;
+#     :id ?id ;
+#     :name ?name ;
+#     :dateLastActivity ?dateLastActivity ;
+#     :contains ?list .
+#   # ?kind rdf:type :Board .
+# }
+
+# #Delete all of the data
+# DELETE WHERE{
+#   ?id rdf:type :Component
+# }
+
+# Get all of the boards
+SELECT ?name {
+  ?name a :Component
+}
+
+# Get the whole account of data in DB
+SELECT (COUNT(?s) as ?numTriples)
+WHERE {
+    ?s ?p ?o .
+}
+
+SELECT ?song
+WHERE {
+    :James_Taylor :sings ?song .
+}
+
+SELECT ?memberShip
+WHERE {
+  ?memberShip a :Membership .
+}
+
+CONSTRUCT {
+    ?domain ?prop ?range
+}
+WHERE {
+    ?subject ?prop ?object .
+    ?subject a ?domain .
+    optional {
+        ?object a ?oClass .
+    }
+    bind(if(bound(?oClass), ?oClass, datatype(?object)) as ?range)
+    filter (?prop != rdf:type && ?prop != rdfs:domain && ?prop != rdfs:range)
 }

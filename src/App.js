@@ -139,6 +139,7 @@ class App extends Component {
               </TableHead>
               <TableBody>
                 {data.map((binding, index) => this.renderRowForBinding(binding, index)).concat(
+               
                 // Create an additional row for adding a new entry (by
                 // iterating through our columnData and creating a table
                 // cell for each column).
@@ -152,7 +153,7 @@ class App extends Component {
                     </TableCell>
                   ))}
                   <TableCell style={styles.actionCell}>
-                    <Button color="primary" onClick={() => this.addItem()}>Add</Button>
+                    <Button color="primary" onClick={() => this.addItem()}>Add Board</Button>
                   </TableCell>
                 </TableRow>
               )}

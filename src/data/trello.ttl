@@ -1,0 +1,260 @@
+@prefix : <http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <http://www.semanticweb.org/yesun/ontologies/2021/2/trello> .
+
+<http://www.semanticweb.org/yesun/ontologies/2021/2/trello> rdf:type owl:Ontology .
+
+#################################################################
+#    Annotation properties
+#################################################################
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/trello#hasName
+<http://api.stardog.com/hasName> rdf:type owl:AnnotationProperty ;
+         rdfs:range rdfs:Literal .
+
+
+###  http://www.w3.org/2003/06/sw-vocab-status/ns#term_status
+<http://www.w3.org/2003/06/sw-vocab-status/ns#term_status> rdf:type owl:AnnotationProperty .
+
+
+#################################################################
+#    Object Properties
+#################################################################
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#contains
+<http://api.stardog.com/contains> rdf:type owl:ObjectProperty ;
+          owl:inverseOf <http://api.stardog.com/partOf> ;
+          rdf:type owl:TransitiveProperty ;
+          rdfs:domain <http://api.stardog.com/Component> ;
+          rdfs:range <http://api.stardog.com/Component> .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#hasAuthority
+<http://api.stardog.com/hasAuthority> rdf:type owl:ObjectProperty ;
+              rdfs:domain <http://api.stardog.com/Membership> ;
+              rdfs:range <http://api.stardog.com/Authority> .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#hasMember
+<http://api.stardog.com/hasMember> rdf:type owl:ObjectProperty ;
+           rdfs:domain <http://api.stardog.com/Membership> ;
+           rdfs:range <http://api.stardog.com/Member> .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#hasMemberShip
+<http://api.stardog.com/hasMemberShip> rdf:type owl:ObjectProperty ,
+                        owl:AsymmetricProperty ,
+                        owl:IrreflexiveProperty ;
+               rdfs:domain <http://api.stardog.com/Board> ;
+               rdfs:range <http://api.stardog.com/Membership> .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#hasProject
+<http://api.stardog.com/hasProject> rdf:type owl:ObjectProperty ;
+            rdfs:domain <http://api.stardog.com/Member> ;
+            rdfs:range <http://api.stardog.com/Board> .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#partOf
+<http://api.stardog.com/partOf> rdf:type owl:ObjectProperty ,
+                 owl:TransitiveProperty ,
+                 owl:IrreflexiveProperty ;
+        rdfs:domain <http://api.stardog.com/Component> ;
+        rdfs:range <http://api.stardog.com/Component> .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  http://schema.org/Person
+<http://schema.org/Person> rdf:type owl:Class ;
+                           owl:equivalentClass <http://xmlns.com/foaf/0.1/Person> .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Authority
+<http://api.stardog.com/Authority> rdf:type owl:Class ;
+           owl:equivalentClass [ rdf:type owl:Class ;
+                                 owl:oneOf ( :Admin
+                                             :Normal
+                                           )
+                               ] ;
+           rdfs:label "Authority"@en .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Board
+<http://api.stardog.com/Board> rdf:type owl:Class ;
+       rdfs:subClassOf <http://api.stardog.com/Component> ;
+       rdfs:label "Board"@en .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Card
+<http://api.stardog.com/Card> rdf:type owl:Class ;
+      rdfs:subClassOf <http://api.stardog.com/Component> ,
+                      [ rdf:type owl:Restriction ;
+                        owl:onProperty <http://api.stardog.com/partOf> ;
+                        owl:allValuesFrom :List
+                      ] ;
+      rdfs:label "Card"@en .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Component
+<http://api.stardog.com/Component> rdf:type owl:Class ;
+           owl:disjointWith <http://api.stardog.com/Person> ;
+           rdfs:label "Component"@en .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#List
+<http://api.stardog.com/List> rdf:type owl:Class ;
+      rdfs:subClassOf <http://api.stardog.com/Component> ,
+                      [ rdf:type owl:Restriction ;
+                        owl:onProperty <http://api.stardog.com/partOf> ;
+                        owl:allValuesFrom <http://api.stardog.com/Board>
+                      ] ;
+      rdfs:label "List"@en .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Member
+<http://api.stardog.com/Member> rdf:type owl:Class ;
+        owl:equivalentClass [ owl:intersectionOf ( <http://api.stardog.com/Person>
+                                                   [ rdf:type owl:Restriction ;
+                                                     owl:onProperty <http://api.stardog.com/hasProject> ;
+                                                     owl:minCardinality "1"^^xsd:nonNegativeInteger
+                                                   ]
+                                                 ) ;
+                              rdf:type owl:Class
+                            ] ;
+        rdfs:subClassOf <http://www.w3.org/2000/10/swap/pim/contact#Person> .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Membership
+<http://api.stardog.com/Membership> rdf:type owl:Class ;
+            owl:equivalentClass [ owl:intersectionOf ( <http://api.stardog.com/Member>
+                                                       [ rdf:type owl:Restriction ;
+                                                         owl:onProperty <http://api.stardog.com/hasAuthority> ;
+                                                         owl:minCardinality "1"^^xsd:nonNegativeInteger
+                                                       ]
+                                                     ) ;
+                                  rdf:type owl:Class
+                                ] .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Person
+<http://api.stardog.com/Person> rdf:type owl:Class ;
+        owl:equivalentClass <http://xmlns.com/foaf/0.1/Person> .
+
+
+###  http://www.w3.org/2000/10/swap/pim/contact#Person
+<http://www.w3.org/2000/10/swap/pim/contact#Person> rdf:type owl:Class ;
+                                                    owl:equivalentClass <http://xmlns.com/foaf/0.1/Person> .
+
+
+###  http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing
+<http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing> rdf:type owl:Class .
+
+
+###  http://xmlns.com/foaf/0.1/Agent
+<http://xmlns.com/foaf/0.1/Agent> rdf:type owl:Class .
+
+
+###  http://xmlns.com/foaf/0.1/Organization
+<http://xmlns.com/foaf/0.1/Organization> rdf:type owl:Class ;
+                                         owl:disjointWith <http://xmlns.com/foaf/0.1/Person> .
+
+
+###  http://xmlns.com/foaf/0.1/Person
+<http://xmlns.com/foaf/0.1/Person> rdf:type owl:Class ;
+                                   rdfs:subClassOf <http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing> ,
+                                                   <http://xmlns.com/foaf/0.1/Agent> ;
+                                   owl:disjointWith <http://xmlns.com/foaf/0.1/Project> ;
+                                   rdfs:comment "A person." ;
+                                   rdfs:isDefinedBy <http://xmlns.com/foaf/0.1/> ;
+                                   rdfs:label "Person" ;
+                                   <http://www.w3.org/2003/06/sw-vocab-status/ns#term_status> "stable" .
+
+
+###  http://xmlns.com/foaf/0.1/Project
+<http://xmlns.com/foaf/0.1/Project> rdf:type owl:Class .
+
+
+#################################################################
+#    Individuals
+#################################################################
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Admin
+<http://api.stardog.com/Admin> rdf:type owl:NamedIndividual ,
+                <http://api.stardog.com/Authority> .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Coding_resolution
+<http://api.stardog.com/Coding_resolution> rdf:type owl:NamedIndividual ,
+                            <http://api.stardog.com/Card> .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Doing
+<http://api.stardog.com/Doing> rdf:type owl:NamedIndividual ,
+                <http://api.stardog.com/List> ;
+       <http://api.stardog.com/contains> <http://api.stardog.com/Coding_resolution> .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Done
+<http://api.stardog.com/Done> rdf:type owl:NamedIndividual ,
+               <http://api.stardog.com/List> ;
+      <http://api.stardog.com/contains> <http://api.stardog.com/Problem_Analysis> .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Membership_of_Rachel
+<http://api.stardog.com/Membership_of_Rachel> rdf:type owl:NamedIndividual ,
+                               <http://api.stardog.com/Membership> ;
+                      <http://api.stardog.com/hasAuthority> <http://api.stardog.com/Admin> ;
+                      <http://api.stardog.com/hasMember> <http://api.stardog.com/Rachel> .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Normal
+<http://api.stardog.com/Normal> rdf:type owl:NamedIndividual ,
+                 <http://api.stardog.com/Authority> .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Problem_Analysis
+<http://api.stardog.com/Problem_Analysis> rdf:type owl:NamedIndividual ,
+                           <http://api.stardog.com/Card> .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Projet_3A
+<http://api.stardog.com/Projet_3A> rdf:type owl:NamedIndividual ,
+                    <http://api.stardog.com/Board> ;
+           <http://api.stardog.com/contains> <http://api.stardog.com/Doing> ,
+                     <http://api.stardog.com/Done> ,
+                     <http://api.stardog.com/ToDo> ;
+           <http://api.stardog.com/hasMemberShip> :Membership_of_Rachel ;
+           <http://api.stardog.com/hasName> "Project 3A"@en .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Rachel
+<http://api.stardog.com/Rachel> rdf:type owl:NamedIndividual ,
+                 <http://api.stardog.com/Member> ;
+        <http://api.stardog.com/hasProject> <http://api.stardog.com/Projet_3A> ;
+        <http://api.stardog.com/hasName> "Rachel"@en .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Test
+<http://api.stardog.com/Test> rdf:type owl:NamedIndividual ,
+               <http://api.stardog.com/Card> .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#ToDo
+<http://api.stardog.com/ToDo> rdf:type owl:NamedIndividual ,
+               <http://api.stardog.com/List> ;
+      <http://api.stardog.com/contains> <http://api.stardog.com/Test> .
+
+
+###  http://www.semanticweb.org/yesun/ontologies/2021/2/untitled-ontology-11#Tom
+<http://api.stardog.com/Tom> rdf:type owl:NamedIndividual ,
+              <http://api.stardog.com/Member> .
+
+
+###  Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi

@@ -1,0 +1,26 @@
+SELECT ?name {
+  ?name rdf:type :#Board .
+}
+
+## Get All of the boards
+SELECT DISTINCT ?board
+WHERE {
+  ?board a :Board.
+}
+
+## Get All of the boards that have a sub-component
+SELECT DISTINCT ?board ?component
+WHERE {
+    ?board a :Board .
+    ?board  :contains ?component .
+}
+
+## Get All of the boards that have a list
+SELECT DISTINCT ?board ?list
+WHERE {
+    ?board a :Board .
+    ?board  :contains ?list .
+    ?list a :List .
+}
+
+
