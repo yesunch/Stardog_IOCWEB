@@ -1,37 +1,64 @@
 const { Connection } = require("stardog");
 
-// Table column data, encoding the order, label, and "selector" for grabbing the
-// data for each column.
+
+
 const columnData = [
   {
+    selector: "board",
+    label: "Board"
+  },
+  {
     selector: "id",
-    label: "ID"
+    label: "Id"
   },
   {
-    selector: "name",
-    label: "Name"
+    selector: "desc",
+    label: "Description"
+  }
+]
+
+const listColumnData = [
+  {
+    selector: "list",
+    label: "List"
   },
   {
-    selector: "dateLastActivity",
-    label: "DateLastActivity"
-  },
-  ,
+    selector: "id",
+    label: "Id"
+  }
+]
+
+const cardColumnData = [
   {
-    selector: "kind",
-    label: "Kind"
+    selector: "card",
+    label: "Card"
   },
-  
-];
+  {
+    selector: "id",
+    label: "Id"
+  }
+]
 
 
 const queryColumnData = [
   {
-    selector: "name",
-    label: "Name"
+    selector: "board",
+    label: "Board"
   },
+  {
+    selector: "component",
+    label: "component"
+  }
+]
+
+const listWithCardData = [
   {
     selector: "list",
     label: "List"
+  },
+  {
+    selector: "card",
+    label: "Card"
   }
 ]
 
@@ -43,6 +70,19 @@ const columnSelectors = columnData.reduce(
 );
 
 const queryColumnSelectors = queryColumnData.reduce(
+  (selectors,{ selector }) => [...selectors, selector],
+  []
+);
+
+const queryListsSelectors = listColumnData.reduce(
+  (selectors,{ selector }) => [...selectors, selector],
+  []
+);
+const queryCardSelectors = cardColumnData.reduce(
+  (selectors,{ selector }) => [...selectors, selector],
+  []
+);
+const queryListWithCardSelectors = listWithCardData.reduce(
   (selectors,{ selector }) => [...selectors, selector],
   []
 );
@@ -64,9 +104,15 @@ const TableDataAvailabilityStatus = {
 };
 
 module.exports = {
-  dbName: 'BoardDb',
+  dbName: 'TrelloDb',
   columnData,
+  listColumnData,
+  cardColumnData,
+  listWithCardData,
   queryColumnSelectors,
+  queryListsSelectors,
+  queryCardSelectors,
+  queryListWithCardSelectors,
   columnSelectors,
   conn,
   TableDataAvailabilityStatus,

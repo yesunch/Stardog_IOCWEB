@@ -21,8 +21,14 @@ import {MDCCheckbox} from "@material/checkbox"
 import {
   TableDataAvailabilityStatus,
   columnData,
+  listColumnData,
+  cardColumnData,
+  listWithCardData,
   columnSelectors,
   queryColumnSelectors,
+  queryListsSelectors,
+  queryCardSelectors,
+  queryListWithCardSelectors,
   conn,
   dbName,
 } from "./helpers/boardConstants";
@@ -46,20 +52,40 @@ const styles = {
 };
 
 const columnHeaders = columnData.map(({ label }) => <TableCell key={label}>{label}</TableCell>);
-const readQuery = `SELECT ?id ?name ?dateLastActivity ?kind  {
-  ?subject a ?kind ;
-    :id ?id ;
-    :name ?name ;
-    :dateLastActivity ?dateLastActivity .
-  ?kind rdfs:subClassOf :Component .
+const listColumnHeader = listColumnData.map(({ label }) => <TableCell key={label}>{label}</TableCell>);
+const cardColumnHeader = cardColumnData.map(({ label }) => <TableCell key={label}>{label}</TableCell>);
+
+const getAllBoardsQuery = `SELECT DISTINCT ?board ?id ?desc
+WHERE {
+  ?board a :Board;
+        :id ?id ;
+        :desc ?desc
 }`;
 
-const componentHasListQuery = `SELECT ?name  ?list {
-  ?subject a :Component ;
-    :id ?id ;
-    :name ?name ;
-    :dateLastActivity ?dateLastActivity ;
-    :HasList ?list .
+const getAllListQuery = `SELECT DISTINCT ?list ?id
+WHERE {
+  ?list a :List;
+        :id ?id .
+}`;
+
+const getAllCardQuery = `SELECT DISTINCT ?card ?id
+WHERE {
+  ?card a :Card ;
+        :id ?id .
+}`;
+
+
+const componentHasListQuery = `SELECT DISTINCT ?board ?component
+WHERE {
+    ?board a :Board .
+    ?board  :contains ?component .
+}`;
+
+const listsHasCardQuery = `SELECT DISTINCT ?list ?card
+WHERE {
+    ?list a :List .
+    ?list  :contains ?card .
+    ?card a :Card .
 }`;
 
 class App extends Component {
@@ -68,7 +94,10 @@ class App extends Component {
     this.state = {
       dataState: TableDataAvailabilityStatus.NOT_REQUESTED,
       data: [],
+      lists: [],
+      cards: [],
       queryResults: [],
+      listWithCard: [],
       enabledReasoning: false
     };
   }
@@ -102,6 +131,48 @@ class App extends Component {
     );
   }
 
+  renderRowForAllListQueryResults(binding, index) {
+    return (
+      // Use every "selector" to extract table cell data from each binding.
+      <TableRow key={binding.id}>
+        {queryListsSelectors.map(selector => (
+          <TableCell key={selector}>
+            {this.getBindingValueForSelector(selector, binding)}
+          </TableCell>
+        ))}
+        <TableCell key={-1} style={styles.actionCell}>
+        <Button color="secondary" onClick={() => this.deleteItem(binding.id)}>Delete</Button>
+      </TableCell>
+      </TableRow>
+    );
+  }
+
+  renderRowForAllCardQueryResults(binding, index) {
+    return (
+      // Use every "selector" to extract table cell data from each binding.
+      <TableRow key={binding.id}>
+        {queryCardSelectors.map(selector => (
+          <TableCell key={selector}>
+            {this.getBindingValueForSelector(selector, binding)}
+          </TableCell>
+        ))}
+      </TableRow>
+    );
+  }
+
+  renderRowForListWithCardResults(binding, index) {
+    return (
+      // Use every "selector" to extract table cell data from each binding.
+      <TableRow key={binding.id}>
+        {queryListWithCardSelectors.map(selector => (
+          <TableCell key={selector}>
+            {this.getBindingValueForSelector(selector, binding)}
+          </TableCell>
+        ))}
+      </TableRow>
+    );
+  }
+
   
 
   //  handleChange = (event) => {
@@ -111,24 +182,25 @@ class App extends Component {
   //   console.log(this.state.enabledReasoning)
   // };
   render() {
-    const { dataState, data, queryResults} = this.state;
+    const { dataState, data, lists, cards, listWithCard, queryResults} = this.state;
     const isLoading = dataState === TableDataAvailabilityStatus.LOADING;
 
     return (
       <div className="App" style={styles.appInnerContainer}>
         <CssBaseline />
         <Paper style={styles.paper}>
-          <Toolbar>
-            <Typography variant="title">
-           The whole content of DB
-            </Typography>
-          </Toolbar>
-          <FormControlLabel
+        <FormControlLabel
           control={<Switch checked={this.state.enabledReasoning} 
           onChange={(event) => {this.setState({enabledReasoning: event.target.checked}, ()=>{this.refreshData(this.state.enabledReasoning)}); }} 
           name="enabledReasoning" />}
           label="Reasoning"
         />
+          <Toolbar>
+            <Typography variant="title">
+           All of the boards
+            </Typography>
+          </Toolbar>
+          
 
           {isLoading ? <CircularProgress style={styles.spinner} /> : (
             <Table>
@@ -162,22 +234,83 @@ class App extends Component {
           )}
           <Toolbar>
           <Typography variant="title">
-              <i>Components</i> that have lists
+              All of the lists
+            </Typography>
+          </Toolbar>
+          <Table>
+            <TableHead>
+              <TableRow>
+              {listColumnHeader}
+                {/* <TableCell>
+                  List
+                </TableCell> */}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+            {lists.map((binding, index) => this.renderRowForAllListQueryResults(binding, index))}
+          
+            </TableBody>
+          </Table>
+
+
+          <Toolbar>
+          <Typography variant="title">
+              All of the cards
+            </Typography>
+          </Toolbar>
+          <Table>
+            <TableHead>
+              <TableRow>
+              {cardColumnHeader}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+            {cards.map((binding, index) => this.renderRowForAllCardQueryResults(binding, index))}
+                 
+          
+            </TableBody>
+          </Table>
+
+          <Toolbar>
+          <Typography variant="title">
+              <i>Boards</i> that have sub-component
             </Typography>
           </Toolbar>
           <Table>
             <TableHead>
               <TableRow>
                 <TableCell>
-                  Component
+                  Board
                 </TableCell>
                 <TableCell>
-                  Lists
+                  Component
                 </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
             {queryResults.map((binding, index) => this.renderRowForQueryResults(binding, index))}
+          
+            </TableBody>
+          </Table>
+
+          <Toolbar>
+          <Typography variant="title">
+              <i>Lists</i> that have cards
+            </Typography>
+          </Toolbar>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>
+                  list
+                </TableCell>
+                <TableCell>
+                  card
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+            {listWithCard.map((binding, index) => this.renderRowForListWithCardResults(binding, index))}
           
             </TableBody>
           </Table>
@@ -201,13 +334,14 @@ class App extends Component {
       dataState: TableDataAvailabilityStatus.LOADING
     });
     // var reasoning = true;
-    query.execute(conn, dbName, readQuery, 'application/sparql-results+json',{
+    query.execute(conn, dbName, getAllBoardsQuery, 'application/sparql-results+json',{
       reasoning: reasoning
     }).then(res => {
       if (!res.ok) {
         this.setState({
           dataState: TableDataAvailabilityStatus.FAILED
         });
+        console.log(res)
         return;
       }
   
@@ -219,7 +353,7 @@ class App extends Component {
         data: bindings
       });
 
-      console.log("data")
+      console.log("**********data*********")
       console.log(bindings)
     });
 
@@ -244,16 +378,82 @@ class App extends Component {
 
 
     });
+
+    query.execute(conn, dbName, getAllListQuery, 'application/sparql-results+json',{
+      reasoning: reasoning
+    }).then(res => {
+      if (!res.ok) {
+        this.setState({
+          dataState: TableDataAvailabilityStatus.FAILED
+        });
+        return;
+      }
+
+      const  results  = res.body.results.bindings;
+      // const bindingsForTable = this.getBindingsFormattedForTable(bindings);
+      console.log("Lists")
+      console.log(results)
+      this.setState({
+        dataState: TableDataAvailabilityStatus.LOADED,
+        lists: results
+      });
+
+
+    });
+
+    query.execute(conn, dbName, getAllCardQuery, 'application/sparql-results+json',{
+      reasoning: reasoning
+    }).then(res => {
+      if (!res.ok) {
+        this.setState({
+          dataState: TableDataAvailabilityStatus.FAILED
+        });
+        return;
+      }
+
+      const  results  = res.body.results.bindings;
+      // const bindingsForTable = this.getBindingsFormattedForTable(bindings);
+      console.log("Lists")
+      console.log(results)
+      this.setState({
+        dataState: TableDataAvailabilityStatus.LOADED,
+        cards: results
+      });
+
+
+    });
+
+    query.execute(conn, dbName, listsHasCardQuery, 'application/sparql-results+json',{
+      reasoning: reasoning
+    }).then(res => {
+      if (!res.ok) {
+        this.setState({
+          dataState: TableDataAvailabilityStatus.FAILED
+        });
+        return;
+      }
+
+      const  results  = res.body.results.bindings;
+      // const bindingsForTable = this.getBindingsFormattedForTable(bindings);
+      console.log("ListsWithCards")
+      console.log(results)
+      this.setState({
+        dataState: TableDataAvailabilityStatus.LOADED,
+        listWithCard: results
+      });
+
+
+    });
   }
 
   getBindingValueForSelector(selector, binding) {
-    const bindingValue = binding[selector === "movie" ? "movies" : selector];
+    const bindingValue = binding[selector];
     // NOTE: In a production app, we would probably want to do this formatting elsewhere.
-    // console.log("bindingValue:")
-    // console.log("selector")
-    // console.log(selector)
-    // console.log("binding")
-    // console.log(binding)
+    console.log("bindingValue:")
+    console.log("selector")
+    console.log(selector)
+    console.log("binding")
+    console.log(binding)
     return bindingValue["value"]
     // return Array.isArray(bindingValue) ? bindingValue.join(", ") : bindingValue;
   }
@@ -275,7 +475,7 @@ addItem() {
   );
   // Auto-generate a subject local name by removing all whitespace and
   // lowercasing the `name` input. This is "good enough" for our purposes.
-  const subject = valueMap.name
+  const subject = valueMap.board
     .trim()
     .split(/\s/)
     .join("")
@@ -286,9 +486,8 @@ addItem() {
   //   .split(/\s/)
   
   const updateTriples = `:${subject} a :Board ;
-    :id '${valueMap.id}' ;
-    :name "${valueMap.name}" ;
-    :dateLastActivity '${valueMap.dateLastActivity}' .
+    :id ${valueMap.id} ;
+    :desc '${valueMap.desc}' .
   `;
 
   // console.log(updateTriples)
@@ -306,10 +505,10 @@ addItem() {
 
 // Again, no validation or optimizations for this example app.
 deleteItem(item) {
-  var itemId = item["value"]
+  var itemId = parseInt(item["value"])
   // Delete all triples where the subject has the given id.
   const deleteQuery = `delete { ?s ?p ?o } where {
-    ?s :id '${itemId}' ;
+    ?s :id ${itemId} ;
        ?p ?o .
   }`;
 

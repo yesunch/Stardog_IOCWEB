@@ -3,16 +3,40 @@ SELECT ?name {
 }
 
 ## Get All of the boards
-SELECT DISTINCT ?board
+SELECT DISTINCT ?board 
 WHERE {
-  ?board a :Board.
+  ?board a :Board .
+            # :id ?id .
+            # :name ?boardName ;
+            # :desc ?desc .
+}
+## Get All of the list
+SELECT DISTINCT ?list ?id
+WHERE {
+  ?list a :List ;
+        :id ?id .
+}
+## Get All of the card
+SELECT DISTINCT ?card ?id ?name ?desc
+WHERE {
+  ?card a :Card ;
+        :id ?id ;
+        :name ?name ;
+        :desc ?desc .
+}
+
+## Delete all of the data
+DELETE {?s ?p ?o} where {
+    ?s ?p ?o .
+    #    :desc "test" .
 }
 
 ## Get All of the boards that have a sub-component
 SELECT DISTINCT ?board ?component
 WHERE {
-    ?board a :Board .
-    ?board  :contains ?component .
+    ?board a :Board ;
+      :id "" ;
+      :desc "test".
 }
 
 ## Get All of the boards that have a list
@@ -21,6 +45,103 @@ WHERE {
     ?board a :Board .
     ?board  :contains ?list .
     ?list a :List .
+}
+
+## Get All of the lists that have a card
+SELECT DISTINCT ?list ?card
+WHERE {
+    ?list a :List .
+    ?list  :contains ?card .
+    ?card a :Card .
+}
+
+## Create a new Board
+INSERT  {
+    ?newBoard a :Board ;
+                :id ?boardId ;
+                :name ?boardName ;
+                :desc "Created a new Board to test" .
+    
+    ?newList_a a :List ;
+               :id ?listId_a ;
+               :name ?listName_a ;
+               :partOf ?newBoard ;
+               :desc "Created a new List to test" .
+    
+    ?newList_b a :List ;
+               :id ?listId_b ;
+               :name ?listName_b ;
+               :partOf ?newBoard ;
+               :desc "Created a new List to test" .
+    
+    ?newList_c a :List ;
+               :id ?listId_c ;
+               :name ?listName_c ;
+               :partOf ?newBoard ;
+               :desc "Created a new List to test" .
+    ?newCard_a a :Card ;
+               :id ?cardId_a ;
+               :name ?cardName_a ;
+               :partOf ?newList_a ;
+               :desc "Created a new Card to test" .
+    ?newCard_b a :Card ;
+               :id ?cardId_b ;
+               :name ?cardName_b ;
+               :partOf ?newList_b ;
+               :desc "Created a new Card to test" .
+    ?newCard_c a :Card ;
+               :id ?cardId_c ;
+               :name ?cardName_c ;
+               :partOf ?newList_c ;
+               :desc "Created a new Card to test" .
+    
+}
+WHERE {
+    BIND (:Projet_3A as ?newBoard) .
+    BIND (22 as ?boardId) .
+    BIND ("Projet 3A" as ?boardName) .
+
+    BIND (:ToDo as ?newList_a) .
+    BIND (1 as ?listId_a) .
+    BIND ("ToDo" as ?listName_a) .
+
+    BIND (:Doing as ?newList_b) .
+    BIND (2 as ?listId_b) .
+    BIND ("Doing" as ?listName_b) .
+
+    BIND (:Done as ?newList_c) .
+    BIND (3 as ?listId_c) .
+    BIND ("Done" as ?listName_c) .
+
+    BIND (:doc as ?newCard_a) .
+    BIND (4 as ?cardId_a) .
+    BIND ("Write development doc" as ?cardName_a) .
+
+    BIND (:coding as ?newCard_b) .
+    BIND (5 as ?cardId_b) .
+    BIND ("Coding" as ?cardName_b) .
+
+    BIND (:demand_analysis as ?newCard_c) .
+    BIND (6 as ?cardId_c) .
+    BIND ("Demand analysis" as ?cardName_c) .
+}
+
+##Create a new List
+INSERT DATA {
+    :list_a a :List .
+    :new_list :id 2 .
+    :new_list :name "new list" .
+    :new_list :desc "Created a new list to test" .
+    :new_list :partOf :board_a .
+}
+
+## Create a new card
+INSERT DATA {
+    :new_card a :Card .
+    :new_card :id 222 .
+    :new_card :name "new card" .
+    :new_card :desc "Created a new card to test" .
+    :new_card :partOf :new_list .
 }
 
 
