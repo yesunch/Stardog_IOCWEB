@@ -12,8 +12,7 @@ npm install    # initilize this project
 $STARDOG_HOME/bin/stardog-admin server start
 yarn start
 cd src/data
-node load-board-data.js # load board data
-$STARDOG_HOME/bin/stardog data add BoardDb myBoards.ttl # add data into db
+$STARDOG_HOME/bin/stardog data add TrelloDb TrelloDb.ttl # add data into db
 ```
 
 ## Data verification in Stardog Studio
